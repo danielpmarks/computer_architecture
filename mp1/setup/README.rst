@@ -309,15 +309,15 @@ For MPs 2-4, you should have at least these three binaries installed: ``riscv32-
 Creating a Github Repository
 ============================
 
-To create your git repository, go to `<https://edu.cs.illinois.edu/create-ghe-repo/ece411-sp21/>`_.
+To create your git repository, go to `<https://edu.cs.illinois.edu/create-ghe-repo/ece411-fa21/>`_.
 
 Next, create a directory to contain your ECE 411 files (this will include subdirectories for each
 MP, so chose a name such as ``ece411``) and execute the following commands (replacing ``NETID`` with
 your netid)::
 
   $ git init
-  $ git remote add origin git@github-dev.cs.illinois.edu:ece411-sp21/NETID.git
-  $ git remote add release git@github-dev.cs.illinois.edu:ece411-sp21/_release.git
+  $ git remote add origin git@github-dev.cs.illinois.edu:ece411-fa21/NETID.git
+  $ git remote add release git@github-dev.cs.illinois.edu:ece411-fa21/_release.git
   $ git fetch release
   $ git merge --allow-unrelated-histories release/mp1 -m "Merging provided MP1 files"
   $ git push --set-upstream origin master
