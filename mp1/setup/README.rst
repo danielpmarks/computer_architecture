@@ -319,7 +319,7 @@ your netid)::
   $ git remote add origin git@github-dev.cs.illinois.edu:ece411-fa21/NETID.git
   $ git remote add release git@github-dev.cs.illinois.edu:ece411-fa21/_release.git
   $ git fetch release
-  $ git merge --allow-unrelated-histories release/mp1 -m "Merging provided MP1 files"
+  $ git merge --allow-unrelated-histories release/MP1 -m "Merging provided MP1 files"
   $ git push --set-upstream origin master
 
 If you have not set up SSH access to your github account, you may encounter an error similar to the following figure.
