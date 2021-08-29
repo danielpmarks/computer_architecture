@@ -20,6 +20,7 @@ default clocking tb_clk @(negedge itf.clk); endclocking
 
 // DO NOT MODIFY CODE ABOVE THIS LINE
 
+/* Uncomment to "monitor" changes to adder operational state over time */
 //initial $monitor("dut-op: time: %0t op: %s", $time, dut.ms.op.name);
 
 
@@ -42,51 +43,7 @@ initial itf.reset_n = 1'b0;
 initial begin
     reset();
     /********************** Your Code Here *****************************/
-    for(int i = 0; i <= 8'hFF; ++i) begin
-		for(int j = 0; j <= 8'hFF; ++j) begin
-			@(tb_clk iff itf.rdy)
-			itf.multiplicand 	<= i;
-			itf.multiplier 	    <= j;
-			itf.start 			<= 1;
-			
-			##(1);
-			
-			itf.start 			<= 0;
-			
-			@(tb_clk iff itf.done);
-			
-			output_equiv: assert (itf.product == i * j) 
-							else begin
-                                $error ("%0d: %0t: BAD_PRODUCT error detected", `__LINE__, $time);
-                                report_error (BAD_PRODUCT);
-                            end
-			
-		end
-	end
-
-    reset();
-
-    for(int i = 0; itf.done != 1; ++ i) begin
-        itf.start <= 1;
-        ##1;
-        itf.start <= 0;
-        ##(i);
-        itf.start = 1;
-        ##1;
-        itf.start = 0;
-    end
-
-    reset();
-
-    for(int i = 0; itf.done != 1; ++ i) begin
-        itf.start <= 1;
-        ##1;
-        itf.start <= 0;
-        ##(i);
-        itf.reset_n = 0;
-        ##1;
-        itf.reset_n = 1;
-    end
+    
 
     /*******************************************************************/
     itf.finish(); // Use this finish task in order to let grading harness
