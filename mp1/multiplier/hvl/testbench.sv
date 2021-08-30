@@ -55,38 +55,53 @@ initial begin
 			
 			@(tb_clk iff itf.done);
 			
-			output_equiv: assert (itf.product == i * j) 
+			assert (itf.product == i * j) 
 							else begin
                                 $error ("%0d: %0t: BAD_PRODUCT error detected", `__LINE__, $time);
                                 report_error (BAD_PRODUCT);
                             end
+            
+            assert (itf.rdy == 1) else begin
+                $error ("%0d: %0t: NOT_READY error detected", `__LINE__, $time);
+                report_error (NOT_READY);
+            end
+
+
 			
 		end
 	end
 
     reset();
 
-    for(int i = 0; itf.done != 1; ++ i) begin
+    for(int i = 0; i < $size(run_states); i++) begin
         itf.start <= 1;
         ##1;
         itf.start <= 0;
-        ##(i);
-        itf.start = 1;
+
+        @(tb_clk iff itf.mult_op == run_states[i])
+        itf.start <= 1;
         ##1;
-        itf.start = 0;
+        itf.start <= 0;
+        
     end
 
     reset();
 
-    for(int i = 0; itf.done != 1; ++ i) begin
+    for(int i = 0; i < $size(run_states); i++) begin
         itf.start <= 1;
-        ##1;
+        ##1
         itf.start <= 0;
-        ##(i);
-        itf.reset_n = 0;
-        ##1;
-        itf.reset_n = 1;
+
+        @(tb_clk iff itf.mult_op == run_states[i])
+        reset();
+        assert(itf.rdy == 1)
+            else begin
+                $error ("%0d: %0t: NOT_READY error detected", `__LINE__, $time);
+                report_error (NOT_READY);
+            end
     end
+
+    reset();
 
     /*******************************************************************/
     itf.finish(); // Use this finish task in order to let grading harness
