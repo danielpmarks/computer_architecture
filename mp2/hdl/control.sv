@@ -300,7 +300,8 @@ begin : state_actions
             end
             AUIPC: begin
                 setALU(alumux::pc_out, alumux::u_imm, 1'b1, alu_add);
-                loadPC(pcmux::alu_out);
+                loadRegfile(regfilemux::alu_out);
+                loadPC(pcmux::pc_plus4);
             end
             BR: begin
                 setALU(alumux::pc_out, alumux::b_imm, 1'b1, alu_add);
@@ -315,6 +316,7 @@ begin : state_actions
                 else 
                     setALU(alumux::rs1_out, alumux::s_imm, 1'b1, alu_add);
                 loadMAR(marmux::alu_out);
+                load_data_out = 1'b1;
             end
             LD1: loadMDR();
             LD2: begin
@@ -326,7 +328,7 @@ begin : state_actions
 
             //CSR:
 
-           
+           default: ;
         endcase
     end 
 end

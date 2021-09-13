@@ -37,13 +37,14 @@ module datapath
     output logic [4:0] rs1, rs2, rd,
     output rv32i_opcode opcode,
 	 
-	 output logic br_en
+	output logic br_en,
+    output rv32i_word mem_address
 );
 
 /******************* Signals Needed for RVFI Monitor *************************/
 rv32i_word pcmux_out, pc_out;
 rv32i_word mdrreg_out;
-rv32i_word marmux_out, mem_address;
+rv32i_word marmux_out;
 rv32i_word alu_out, alumux1_out, alumux2_out;
 
 logic [31:0] rs1_out, rs2_out;
@@ -92,7 +93,15 @@ register MAR(
     .out (mem_address)
 );
 
-register pc(
+register mem_data_out(
+    .clk (clk),
+    .rst (rst),
+    .load (load_data_out),
+    .in(rs2_out),
+    .out(mem_wdata)
+);
+
+pc_register PC(
     .clk (clk),
     .rst (rst),
     .load (load_pc),
@@ -116,7 +125,6 @@ regfile regfile(
 
 
 
-
 /*****************************************************************************/
 
 /******************************* ALU and CMP *********************************/
@@ -131,26 +139,12 @@ alu ALU(
 
 );
 
-branch_funct3_t cmpop;
-
-always_comb begin
-    unique case(funct3)
-        1'b000: cmpop = beq;
-        1'b001: cmpop = bne;
-        1'b100: cmpop = blt;
-        1'b101: cmpop = bge;
-        1'b110: cmpop = bltu;
-        1'b111: cmpop = bgeu;
-		  default: cmpop = beq;
-    endcase
-end
-
 cmp compare(
     .rs1(rs1_out),
     .rs2(rs2_out),
     .i_imm(i_imm),
     .cmpmux(cmpmux_sel),
-    .cmpop(cmpop),
+    .cmpop(branch_funct3_t'(funct3)),
     .br_en(br_en)
 );
 

@@ -20,6 +20,7 @@ module cmp(
             bge: br_en = $signed(rs1) >= $signed(rs2);
             bltu: br_en = rs1 < rs2;
             bgeu: br_en = rs1 >= rs2;
+            default: ;
         endcase
     end
 
