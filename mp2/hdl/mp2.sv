@@ -16,6 +16,10 @@ module mp2
 /******************* Signals Needed for RVFI Monitor *************************/
 logic load_pc;
 logic load_regfile;
+logic load_ir;
+logic load_mar;
+logic load_mdr;
+logic load_data_out;
 /*****************************************************************************/
 
 /**************************** Control Signals ********************************/
@@ -25,6 +29,18 @@ alumux::alumux2_sel_t alumux2_sel;
 regfilemux::regfilemux_sel_t regfilemux_sel;
 marmux::marmux_sel_t marmux_sel;
 cmpmux::cmpmux_sel_t cmpmux_sel;
+
+alu_ops aluop;
+branch_funct3_t cmpop;
+
+
+logic [2:0] funct3;
+logic [6:0] funct7;
+
+logic br_en;
+
+logic [4:0] rs1, rs2, rd;
+rv32i_opcode opcode;
 /*****************************************************************************/
 
 /* Instantiate MP 1 top level blocks here */
