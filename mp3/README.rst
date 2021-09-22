@@ -483,7 +483,7 @@ reads and writes (with a similar level of detail as the given MP2 spec). It shou
 - how data is written to the data arrays on a write hit;
 - how data is written from the data arrays to main memory on an eviction;
 - how the LRU determines which way to use; and
-- the cache controller with states, state descriptions, transition conditions, and output signals
+- the cache controller with states, state descriptions, transition conditions (On the diagram and in a table), and output signals
   as a function of state (Moore machine) or as a function of state and input (Mealy machine).
 - the cache datapath with explicitly labeled modules and signals from the controller or other modules
 
