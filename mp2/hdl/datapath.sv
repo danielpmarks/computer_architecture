@@ -38,7 +38,10 @@ module datapath
     output rv32i_opcode opcode,
 	 
 	output logic br_en,
-    output rv32i_word mem_address
+    output rv32i_word mem_address,
+
+    output logic [1:0] mem_addr_bits,
+    input logic [3:0] rmask, wmask
 );
 
 /******************* Signals Needed for RVFI Monitor *************************/
@@ -49,6 +52,8 @@ rv32i_word alu_out, alumux1_out, alumux2_out;
 
 logic [31:0] rs1_out, rs2_out;
 rv32i_word regfilemux_out;
+
+
 
 /*****************************************************************************/
 
@@ -85,6 +90,14 @@ register MDR(
     .out  (mdrreg_out)
 );
 
+register #(.width(2)) byte_select (
+    .clk(clk),
+    .rst(rst),
+    .load(load_mar),
+    .in(marmux_out[1:0]),
+    .out(mem_addr_bits)
+);
+
 register MAR(
     .clk (clk),
     .rst (rst),
@@ -93,12 +106,28 @@ register MAR(
     .out (mem_address)
 );
 
+logic [31:0] mem_d_out;
+/*
+assign mem_wdata[31:24] = wmask[3] ? mem_d_out[31:24] : 8'd0;
+assign mem_wdata[23:16] = wmask[2] ? mem_d_out[23:16] : 8'd0;
+assign mem_wdata[15:8]  = wmask[1] ? mem_d_out[15:8]  : 8'd0; 
+assign mem_wdata[7:0]   = wmask[0] ? mem_d_out[7:0]   : 8'd0;
+*/
+always_comb begin
+	unique case(wmask)
+		 4'b0001, 4'b0011, 4'b1111: mem_wdata = mem_d_out;
+		 4'b0010: mem_wdata = mem_d_out << 8;
+		 4'b0100, 4'b1100: mem_wdata = mem_d_out << 16;
+		 4'b1000: mem_wdata = mem_d_out << 24;
+         default: mem_wdata = mem_d_out;
+	endcase
+end 
 register mem_data_out(
     .clk (clk),
     .rst (rst),
     .load (load_data_out),
     .in(rs2_out),
-    .out(mem_wdata)
+    .out(mem_d_out)
 );
 
 pc_register PC(
@@ -108,7 +137,6 @@ pc_register PC(
     .in (pcmux_out),
     .out (pc_out)
 );
-
 
 /* REGFILE */
 regfile regfile(
@@ -201,10 +229,39 @@ always_comb begin : MUXES
         regfilemux::u_imm: regfilemux_out = u_imm;
         regfilemux::lw: regfilemux_out = mdrreg_out;
         regfilemux::pc_plus4: regfilemux_out = pc_out + 4;
-        regfilemux::lb: regfilemux_out = {{24{mdrreg_out[3]}}, mdrreg_out[3:0]};
-        regfilemux::lbu: regfilemux_out = {{24{1'b0}}, mdrreg_out[3:0]};
-        regfilemux::lh: regfilemux_out = {{16{mdrreg_out[7]}}, mdrreg_out[7:0]};
-        regfilemux::lhu: regfilemux_out = {{24{1'b0}}, mdrreg_out[7:0]};
+        regfilemux::lb: begin 
+            unique case(rmask)
+                4'b1000: regfilemux_out = {{24{mdrreg_out[31]}}, mdrreg_out[31:24]};
+                4'b0100: regfilemux_out = {{24{mdrreg_out[23]}}, mdrreg_out[23:16]};
+                4'b0010: regfilemux_out = {{24{mdrreg_out[15]}}, mdrreg_out[15:8]};
+                4'b0001: regfilemux_out = {{24{mdrreg_out[7]}}, mdrreg_out[7:0]};
+                default: ;
+            endcase
+        end
+        regfilemux::lbu: begin 
+            unique case(rmask)
+                4'b1000: regfilemux_out = {{24{1'b0}}, mdrreg_out[31:24]};
+                4'b0100: regfilemux_out = {{24{1'b0}}, mdrreg_out[23:16]};
+                4'b0010: regfilemux_out = {{24{1'b0}}, mdrreg_out[15:8]};
+                4'b0001: regfilemux_out = {{24{1'b0}}, mdrreg_out[7:0]};
+                default: ;
+           endcase
+        end
+        regfilemux::lh: begin 
+            unique case(rmask)
+                4'b1100: regfilemux_out = {{16{mdrreg_out[31]}}, mdrreg_out[31:16]};
+                4'b0011: regfilemux_out = {{16{mdrreg_out[15]}}, mdrreg_out[15:0]}; 
+                default: ; 
+            endcase
+        end
+        regfilemux::lhu: begin 
+            unique case(rmask)
+                4'b1100: regfilemux_out = {{24{1'b0}}, mdrreg_out[31:16]};
+                4'b0011: regfilemux_out = {{24{1'b0}}, mdrreg_out[15:0]};  
+                default: ;
+            endcase 
+        end
+            
         default: `BAD_MUX_SEL;
     endcase
 

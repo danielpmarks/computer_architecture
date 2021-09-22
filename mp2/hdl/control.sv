@@ -29,13 +29,15 @@ module control
     output logic mem_read,
     output logic mem_write,
 	 
-	 output logic [3:0] mem_byte_enable
+	output logic [3:0] mem_byte_enable,
+    input logic [1:0] mem_addr_bits,
+
+    output logic [3:0] rmask, wmask
 );
 
 /***************** USED BY RVFIMON --- ONLY MODIFY WHEN TOLD *****************/
 logic trap;
 logic [4:0] rs1_addr, rs2_addr;
-logic [3:0] rmask, wmask;
 
 branch_funct3_t branch_funct3;
 store_funct3_t store_funct3;
@@ -54,6 +56,8 @@ begin : trap_check
     trap = 0;
     rmask = '0;
     wmask = '0;
+	 
+    mem_byte_enable = 4'b1111;
 
     case (opcode)
         op_lui, op_auipc, op_imm, op_reg, op_jal, op_jalr:;
@@ -68,8 +72,19 @@ begin : trap_check
         op_load: begin
             case (load_funct3)
                 lw: rmask = 4'b1111;
-                lh, lhu: rmask = 4'bXXXX /* Modify for MP1 Final */ ;
-                lb, lbu: rmask = 4'bXXXX /* Modify for MP1 Final */ ;
+                lh, lhu:
+                    unique case(mem_addr_bits)
+                        2'b00: rmask = 4'b0011;
+                        2'b10: rmask = 4'b1100;
+                        default: ;
+                    endcase 
+                lb, lbu: 
+                    unique case(mem_addr_bits)
+                        2'b00: rmask = 4'b0001;
+                        2'b01: rmask = 4'b0010;
+                        2'b10: rmask = 4'b0100;
+                        2'b11: rmask = 4'b1000;
+                    endcase
                 default: trap = 1;
             endcase
         end
@@ -77,8 +92,27 @@ begin : trap_check
         op_store: begin
             case (store_funct3)
                 sw: wmask = 4'b1111;
-                sh: wmask = 4'bXXXX /* Modify for MP1 Final */ ;
-                sb: wmask = 4'bXXXX /* Modify for MP1 Final */ ;
+                sh: begin
+                unique case(mem_addr_bits)
+                    2'b00: begin 
+                        wmask = 4'b0011;
+                    end
+                    2'b10: begin 
+                        wmask = 4'b1100;
+                    end
+                    default: ;
+                endcase
+                mem_byte_enable = wmask;
+                end
+                sb: begin
+                unique case(mem_addr_bits)
+                        2'b00: wmask = 4'b0001;
+                        2'b01: wmask = 4'b0010;
+                        2'b10: wmask = 4'b0100;
+                        2'b11: wmask = 4'b1000;
+                    endcase
+                    mem_byte_enable = wmask;
+                end
                 default: trap = 1;
             endcase
         end
@@ -103,7 +137,9 @@ enum int unsigned {
     LD1,
     LD2,
     ST1,
-    ST2
+    ST2,
+    JAL,
+    JALR
 } state, next_state;
 
 /************************* Function Definitions *******************************/
@@ -141,7 +177,6 @@ function void set_defaults();
     aluop = alu_ops'(funct3);
     mem_read = 1'b0;
     mem_write = 1'b0;
-    mem_byte_enable = 4'b1111;
 endfunction
 
 /**
@@ -320,14 +355,32 @@ begin : state_actions
             end
             LD1: loadMDR();
             LD2: begin
-                loadRegfile(regfilemux::lw);
+                unique case(funct3)
+                    lb: loadRegfile(regfilemux::lb);
+                    lh: loadRegfile(regfilemux::lh);
+                    lw: loadRegfile(regfilemux::lw);
+                    lbu: loadRegfile(regfilemux::lbu);
+                    lhu: loadRegfile(regfilemux::lhu);
+                    default: ;
+                endcase
                 loadPC(pcmux::pc_plus4);
             end
-            ST1: mem_write = 1'b1;
+            ST1: begin 
+                mem_write = 1'b1;
+                
+            end
             ST2: loadPC(pcmux::pc_plus4);
 
-            //CSR:
-
+            JAL: begin
+                setALU(alumux::pc_out, alumux::j_imm, 1'b1, alu_add);
+                loadPC(pcmux::alu_out);
+                loadRegfile(regfilemux::pc_plus4);
+            end
+            JALR: begin
+                setALU(alumux::rs1_out, alumux::i_imm, 1'b1, alu_add);
+                loadPC(pcmux::alu_mod2);
+                loadRegfile(regfilemux::pc_plus4);
+            end
            default: ;
         endcase
     end 
@@ -359,10 +412,10 @@ begin : next_state_logic
                     op_imm: next_state = IMM;
                     op_reg: next_state = REG;
                     op_csr: next_state = CSR;
-                    /*
-                    op_jal:
-                    op_jalr: 
-                    */
+                    
+                    op_jal: next_state = JAL;
+                    op_jalr: next_state = JALR;
+                    
                     default: next_state = FETCH1;
                 endcase
             end
@@ -388,8 +441,6 @@ begin : next_state_logic
                     next_state = ST1;
             end
             LD2, ST2: next_state = FETCH1;
-
-            //CSR:
 
             default: next_state = FETCH1;
         endcase

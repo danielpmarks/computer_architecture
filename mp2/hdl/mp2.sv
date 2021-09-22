@@ -38,9 +38,12 @@ logic [2:0] funct3;
 logic [6:0] funct7;
 
 logic br_en;
+logic [1:0] mem_addr_bits;
 
 logic [4:0] rs1, rs2, rd;
 rv32i_opcode opcode;
+
+logic [3:0] rmask, wmask;
 /*****************************************************************************/
 
 /* Instantiate MP 1 top level blocks here */
