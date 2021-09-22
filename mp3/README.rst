@@ -516,7 +516,7 @@ Upload, as a single PDF document, your design (datapath and controller) and test
 Compass before the posted deadline. Your testing analysis should not be longer than a single page
 (not including test code).
 
-Checkpoint One
+Checkpoint Two
 -----------------
 
 For the second checkpoint, you will be required to have **cache reads** working. The autograder will
@@ -532,7 +532,7 @@ Submit your design to Git by 11:59pm on the deadline. Your cache should be able 
 reads, including overwriting clean data in the cache.
 
 
-Checkpoint Two
+Checkpoint Three
 --------------
 
 For the final hand-in, you should have a working processor supporting the full rv32i ISA and a
@@ -562,11 +562,11 @@ Grading Rubric
   - Paper Design: 18 points (15%)
   - Testing Strategy: 6 points (5%)
   
-- Checkpoint 1: 30 (25%)
+- Checkpoint 2: 30 (25%)
 
   - Cache Reads: 30 points (25%)
 
-- Checkpoint 2: 66 points (55%)
+- Checkpoint 3: 66 points (55%)
 
   - Targeted Tests: 36 points (30%)
   - Longer Test: 24 points (20%)
