@@ -475,8 +475,7 @@ Design Checkpoint
 ----------------
 
 For the first checkpoint, you will need to submit a **digital** design (ie. nothing hand-drawn) of your cache datapath and
-cache controller (max 5 states) that shows that you have made significant progress on your design. What does significant
-progress mean? Your paper design should be detailed enough for TAs to trace the execution of cache
+cache controller (max 5 states) that shows that you have a complete paper design. Your paper design should be detailed enough for TAs to trace the execution of cache
 reads and writes (with a similar level of detail as the given MP2 spec). It should show at least:
 
 - how data is read from the data arrays on a read hit;
@@ -508,6 +507,8 @@ In addition to the 'paper' design, you should start planning how you will test y
    an English description or code, and may be RISC-V assembly or cache input stimuli.
 3. **Briefly describe** how you will unit test your cache as the DUT itself, rather than as part of your
    processor.
+
+**Please READ the entirety of this documentation before starting your design** 
 
 Deliverables
 ^^^^^^^^^^^^
