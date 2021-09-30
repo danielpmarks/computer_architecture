@@ -1,7 +1,7 @@
 # MP3 with golden CPU
 
 ## Purpose
-The course staffs decided to release a golden version of the MP2 because of the AG issues that we have been facing thus far. The MP2 solution is **ENCRYPTED** (of course :), but you can still run ModelSim on it to test your MP3 cache design. The purpose of this release is for you to make sure that bugs in your MP3 is not an error caused by the your MP2. IF you are confident about your MP2, feel free to keep it for your MP3. 
+The course staffs decided to release a golden version of the MP2 because of the AG issues that we have been facing thus far. The MP2 solution is **ENCRYPTED** (of course :), but you can still run ModelSim on it to test your MP3 cache design. The purpose of this release is for you to make sure that bugs in your MP3 is not an error caused by your MP2. IF you are confident about your MP2, feel free to keep it for your MP3. 
 
 ## Warning
 You should still copy your MP2 design into the MP3 folder as instructed in the MP3 document. **Your MP2 files** will be used for timing and synthesis. 
