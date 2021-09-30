@@ -69,7 +69,6 @@ do mp3.do
 - Do follow the usual procedure of committing the `.sdc` with your own design. 
 
 ## Submission
-- **You should** still commit your MP2 design into your MP3 submissions.
 - The AG will grade on timing based on only your MP3 cache
 - The AG will test your design correctness with the golden design
 
