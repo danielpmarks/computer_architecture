@@ -1,10 +1,7 @@
 # MP3 with golden CPU
 
 ## Purpose
-The course staffs decided to release a golden version of the MP2 because of the AG issues that we have been facing thus far. The MP2 solution is **ENCRYPTED** (of course :), but you can still run ModelSim on it to test your MP3 cache design. The purpose of this release is for you to make sure that bugs in your MP3 is not an error caused by your MP2. IF you are confident about your MP2, feel free to keep it for your MP3. 
-
-## Warning
-You should still copy your MP2 design into the MP3 folder as instructed in the MP3 document. **Your MP2 files** will be used for timing and synthesis. 
+The course staffs decided to release a golden version of the MP2 because of the AG issues that we have been facing thus far. The MP2 solution is **ENCRYPTED** (of course :), but you can still run ModelSim on it to test your MP3 cache design. The purpose of this release is for you to make sure that bugs in your MP3 is not an error caused by your MP2. See the submission section for how grading works. 
 
 ## Overview
 - With the golden design, you can do the following
@@ -18,10 +15,8 @@ You should still copy your MP2 design into the MP3 folder as instructed in the M
 1. Make sure the fetch/clone steps are done for MP3.
 2. Download the `mp3.do` and `cpu_golden.vp`.
 4. Move `mp3.do` into `[PATH_TO_YOUR_GIT_REPO]/mp3/simulation/modelsim`
-5. Change the `cpu cpu(.*);` to `cpu_golden cpu(.*);` in `mp3.sv` (not `mp3.do`)
-   * You could also replace this line by instatiating your MP2 design. 
+5. Change the `cpu cpu(.*);` to `cpu_golden cpu(.*);` in `mp3.sv` (not `mp3.do`) 
 6. Organize your `hdl/` files like the following in your folder. **Keep everything else the same!**
-   * The `cpu/cpu.sv` is the renamed from `mp2.sv`.
 ```
 hdl
 ├── cache
@@ -34,16 +29,6 @@ hdl
 │   ├── cache_datapath.sv
 │   └── data_array.sv
 ├── cacheline_adaptor.sv
-├── cpu
-│   ├── alu.sv
-│   ├── cmp.sv
-│   ├── control.sv
-│   ├── cpu.sv
-│   ├── datapath.sv
-│   ├── ir.sv
-│   ├── pc_reg.sv
-│   ├── regfile.sv
-│   └── register.sv
 ├── cpu_golden.vp
 ├── mp3.sv
 ├── rv32i_mux_types.sv
@@ -65,12 +50,17 @@ do mp3.do
 
 ## Timing
 - Running timing and synthesis with the encrypted MP2 requires a Quartus Prime Pro edition software. The EWS offers such software, but we do not recommend this approach because the workflow in the Pro edition is very different from the Standard edition.
-- Instead of running the encrypted MP2, you should run the timing/synthesis with **your own MP2 CPU** + your MP3 cache. The `.sdc` setups are the same for MP2. 
-- Do follow the usual procedure of committing the `.sdc` with your own design. 
+- Instead of running the encrypted MP2, you can run the timing/synthesis with **your own MP2 CPU** + your MP3 cache. The `.sdc` setups are the same for MP2. 
+- **There's no need to commit the `.sdc` file for autograding**, we will replace it with our `.sdc`. 
 
 ## Submission
-- The AG will grade on timing based on only your MP3 cache
-- The AG will test your design correctness with the golden design
+- Commit the following
+   * Changes in `hdl/cache/`
+   * `hdl/cpu_golden.sv`
+   * `hdl/cacheline_adaptor.sv`
+   * `hdl/mp3.sv`
+- The AG will grade on timing based on only your MP3 cache.
+- The AG will test your design correctness with the golden CPU.
 
 ## Things to note
 1. Although we provide you a perfect implementation of the MP2, the simulation does not have access to the internal of this perfect CPU. We recommend the following for debugging
