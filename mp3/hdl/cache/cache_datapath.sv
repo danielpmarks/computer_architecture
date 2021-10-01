@@ -57,7 +57,7 @@ assign tag = mem_address[31-:s_tag];
 
 assign data_to_pmem = data_out;
 
-array #(.width(1), .s_index(s_index)) LRUs(.*, .load(load_set), .read(1'b1), .rindex(set_idx), .windex(set_idx), .datain(lru_in), .dataout(lru_out));
+array #(.width(1), .s_index(s_index)) LRUs(.*, .load(load_lru), .read(1'b1), .rindex(set_idx), .windex(set_idx), .datain(lru_in), .dataout(lru_out));
 
 array #(.width(1), .s_index(s_index)) valid_0s(.*, .load(load_valid_0), .read(1'b1), .rindex(set_idx), .windex(set_idx), .datain(valid_in), .dataout(valid_out_0));
 array #(.width(1), .s_index(s_index)) valid_1s(.*, .load(load_valid_1), .read(1'b1), .rindex(set_idx), .windex(set_idx), .datain(valid_in), .dataout(valid_out_1));
@@ -130,7 +130,7 @@ always_comb begin
         if(valid_out_0 == 0) begin
             //Wait for load signal
             if(load == 1) begin
-                write_data_0 = 1;
+                load_data_0 = 1;
                 load_valid_0 = 1;
                 load_dirty_0 = 1;
                 load_data_0 = 1;
@@ -146,7 +146,7 @@ always_comb begin
         else if (valid_out_1 == 0) begin
             //Wait for load signal
             if(load == 1) begin
-                write_data_1 = 1;
+                load_data_1 = 1;
                 load_valid_1 = 1;
                 load_dirty_1 = 1;
                 load_data_1 = 1;
@@ -169,7 +169,7 @@ always_comb begin
                     replace_address = {tag_out_0, set_idx, 5'd0};
                     //Wait for write signal to store data from pmem
                     if(load == 1) begin
-                        write_data_0 = 1;
+                        load_data_0 = 1;
                         load_valid_0 = 1;
                         load_dirty_0 = 1;
                         load_tag_0 = 1;
@@ -189,13 +189,13 @@ always_comb begin
                     replace_address = {tag_out_1, set_idx, 5'd0};
                     //Wait for write signal to store data from pmem
                     if(load == 1) begin
-                        write_data_1 = 1;
+                        load_data_1 = 1;
                         load_valid_1 = 1;
                         load_dirty_1 = 1;
                         load_tag_1= 1;
                         load_lru = 1;
 
-                        lru_in = 1;
+                        lru_in = 0;
                         valid_in = 1;
                         dirty_in = 0;
                     end
