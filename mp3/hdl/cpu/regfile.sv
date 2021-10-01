@@ -1,4 +1,3 @@
-/* DO NOT MODIFY. WILL BE OVERRIDDEN BY THE AUTOGRADER. */
 
 module regfile
 (
