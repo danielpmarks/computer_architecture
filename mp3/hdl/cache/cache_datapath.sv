@@ -90,7 +90,7 @@ always_comb begin
     dirty_in = 0;
     valid_in = 0;
     lru_in = 0;
-    if(tag == tag_out_0) begin
+    if(tag == tag_out_0 && valid_out_0 == 1) begin
         // Hit - read from cacheline for read op and write to cacheline for write op
         hit = 1;
         if(read) begin
@@ -106,7 +106,7 @@ always_comb begin
             lru_in = 1;
         end
     end
-    else if(tag == tag_out_1) begin
+    else if(tag == tag_out_1 && valid_out_1 == 1) begin
         // Hit - read from cacheline for read op and write to cacheline for write op
         
         hit = 1;

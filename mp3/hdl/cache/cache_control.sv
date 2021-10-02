@@ -28,7 +28,6 @@ module cache_control (
 // Buffer is used to make sure that a second read/write is not
 // performed after mem_resp is asserted and mem_read/mem_write is still high
 
-logic flag;
 
 enum int unsigned {
     HIT_RW,
@@ -40,10 +39,8 @@ enum int unsigned {
 always_ff @(posedge clk) begin
     if(rst) begin
         state <= BUFFER;
-        flag <= 1'b0;
     end
     else begin
-        flag <= flag == 1'b0;
         state <= next_state;
     end
 end
@@ -83,14 +80,21 @@ always_comb begin: state_control_logic
                 cache_data_mux_sel = 1;
             end
         end
+        default: ;
     endcase
 
 end
 
 always_comb begin : next_state_logic
-    next_state = HIT_RW;
+    next_state = BUFFER;
     unique case(state)
-        BUFFER: next_state = HIT_RW;
+        BUFFER:  begin
+            if(mem_read || mem_write)
+                next_state = HIT_RW;
+            else begin
+                next_state = BUFFER;
+            end
+        end
         HIT_RW: begin
             if(mem_read) begin
                 next_state = hit ? BUFFER : dirty ? STORE_TO_PMEM : LOAD_FROM_PMEM;

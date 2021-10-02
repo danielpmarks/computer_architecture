@@ -23,13 +23,13 @@ module mp3
 
 // Keep cpu named `cpu` for RVFI Monitor
 // Note: you have to rename your mp2 module to `cpu`
-cpu cpu(.*);
+cpu_golden cpu(.*);
 
 // Keep cache named `cache` for RVFI Monitor
 cache cache(.*,
     .pmem_rdata(line_o),
     .pmem_wdata(line_i),
-    .pmem_resp(resp_o),
+    .pmem_resp(pmem_resp_cache),
     .pmem_address(pmem_address_cache),
     .pmem_write(pmem_write_cache),
     .pmem_read(pmem_read_cache)
@@ -44,6 +44,8 @@ cacheline_adaptor cacheline_adaptor
     .write_i(pmem_write_cache),
     .resp_o(pmem_resp_cache),
     .address_i(pmem_address_cache),
+    .line_i(line_i),
+    .line_o(line_o),
 
     .burst_i(pmem_rdata),
     .burst_o(pmem_wdata),
